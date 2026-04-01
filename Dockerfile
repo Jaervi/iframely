@@ -14,8 +14,8 @@ ENV NODE_ENV=local
 ENV HOST=::
 
 ## Utilize docker layer cache
-COPY package.json package-lock.json /iframely/
-RUN npm install --omit=dev
+COPY package.json package-lock.json* /iframely/
+RUN npm install --production
 
 COPY . /iframely
 
