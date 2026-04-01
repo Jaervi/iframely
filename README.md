@@ -1,3 +1,12 @@
+# Fork of Iframely 
+
+A fork, designed to build iframely images with the following environment variables supported
+
+- WORKERS (Number of processes, default: all CPUs)
+- MEM_LIMIT (Max MB per process, default: 120)
+- CACHE_TTL (Cache duration in seconds, default: 86400)
+
+
 # Iframely API for Responsive Web Embeds and URL Meta
 
 This is the self-hosted version of [Iframely](https://iframely.com)'s APIs and HTML parsers. 
