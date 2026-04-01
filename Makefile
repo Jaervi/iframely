@@ -6,14 +6,12 @@ EXPOSEPORT	:= 8061
 PUBLISHPORT := ${EXPOSEPORT}
 
 build:
-	git checkout main 
-	git branch -f tag-${VERSION}
-	git checkout tag-${VERSION}
+	# Removed the git checkout/branching steps. Just build what we have!
 	docker \
-		build \
-		--pull \
-		--rm --tag=${CONTAINER} .
-	@echo Image tag: ${VERSION}
+	  build \
+	  --pull \
+	  --rm --tag=$(CONTAINER) .
+	@echo Image built with tag: $(CONTAINER):$(VERSION)
 
 start: run
 
@@ -64,16 +62,13 @@ history:
 		history ${CONTAINER}
 
 clean:
-	-docker \
-		rm ${CONTAINER}
-	-docker \
-		rmi ${CONTAINER}
-	git branch -d tag-${VERSION}
+	-docker rm $(CONTAINER)
+	-docker rmi $(CONTAINER)
 
 push:
-	docker tag ${CONTAINER} ${IMAGE_NAME}:${VERSION}
-	docker tag ${CONTAINER} ${IMAGE_NAME}:latest
-	docker push ${IMAGE_NAME}:${VERSION}
-	docker push ${IMAGE_NAME}
+	docker tag $(CONTAINER) $(IMAGE_NAME):$(VERSION)
+	docker tag $(CONTAINER) $(IMAGE_NAME):latest
+	docker push $(IMAGE_NAME):$(VERSION)
+	docker push $(IMAGE_NAME):latest
 
 restart: stop clean run
