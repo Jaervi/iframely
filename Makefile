@@ -7,7 +7,6 @@ PUBLISHPORT := ${EXPOSEPORT}
 HOST        := ::
 
 build:
-	# Removed the git checkout/branching steps. Just build what we have!
 	docker \
 	  build \
 	  --pull \

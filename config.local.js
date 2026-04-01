@@ -50,7 +50,7 @@ export default {
     */
 
     port: 8061, //can be overridden by PORT env var
-    host: '0.0.0.0',    // Dockers beware. See https://github.com/itteco/iframely/issues/132#issuecomment-242991246
+    host: '::',    // Dockers beware. See https://github.com/itteco/iframely/issues/132#issuecomment-242991246
                         //can be overridden by HOST env var
 
     // Optional SSL cert, if you serve under HTTPS.
