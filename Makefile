@@ -4,11 +4,9 @@ IMAGE_NAME	:= ${HUB_USER}/${CONTAINER}
 VERSION		:= ${VERSION}
 EXPOSEPORT	:= 8061
 PUBLISHPORT := ${EXPOSEPORT}
+HOST        := ::
 
 build:
-	git checkout main 
-	git branch -f tag-${VERSION}
-	git checkout tag-${VERSION}
 	docker \
 		build \
 		--pull \
@@ -26,6 +24,10 @@ run:
 		--hostname=${CONTAINER} \
 		--name=${CONTAINER} \
 		-e NODE_TLS_REJECT_UNAUTHORIZED=0 \
+		-e MAX_WORKERS=${MAX_WORKERS} \
+		-e MAX_MEMORY=${MAX_MEMORY} \
+		-e CACHE_TTL=${CACHE_TTL} \
+		-e HOST=${HOST} \
 		-p ${PUBLISHPORT}:${EXPOSEPORT} \
 		-v ${PWD}/config.local.js:/iframely/config.local.js \
 		$(CONTAINER)
@@ -68,7 +70,6 @@ clean:
 		rm ${CONTAINER}
 	-docker \
 		rmi ${CONTAINER}
-	git branch -d tag-${VERSION}
 
 push:
 	docker tag ${CONTAINER} ${IMAGE_NAME}:${VERSION}

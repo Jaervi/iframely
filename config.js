@@ -16,6 +16,7 @@
 
         baseAppUrl: "",
         port: 8061,
+        host: "::",
         relativeStaticUrl: "/s",
         use_http2: true,
         DEBUG: false,
@@ -29,7 +30,7 @@
 
         // Default cache engine to prevent warning.
         CACHE_ENGINE: 'node-cache',
-        CACHE_TTL: 24 * 60 * 60,
+        CACHE_TTL: process.env.CACHE_TTL ? parseInt(process.env.CACHE_TTL, 10) : 24 * 60 * 60,
         CACHE_ERROR_TTL: 10 * 60,   // 10 min - cache for error responses.
         API_REQUEST_CACHE_TTL: 30 * 24 * 60 * 60,
         IMAGE_META_CACHE_TTL: 7 * 24 * 60 * 60,
