@@ -1,17 +1,45 @@
-CONTAINER	:= iframely
-HUB_USER	:= ${USER}
-IMAGE_NAME	:= ${HUB_USER}/${CONTAINER}
-VERSION		:= ${VERSION}
-EXPOSEPORT	:= 8061
+CONTAINER   := iframely
+HUB_USER    := ${USER}
+IMAGE_NAME  := ${HUB_USER}/${CONTAINER}
+VERSION     ?= $(shell git describe --tags --always 2>/dev/null || echo latest)
+EXPOSEPORT  := 8061
 PUBLISHPORT := ${EXPOSEPORT}
 
-build:
-	# Removed the git checkout/branching steps. Just build what we have!
-	docker \
-	  build \
-	  --pull \
-	  --rm --tag=$(CONTAINER) .
-	@echo Image built with tag: $(CONTAINER):$(VERSION)
+# Buildx setup
+PLATFORMS   := linux/amd64,linux/arm64
+BUILDER     := iframely-builder
+
+.PHONY: buildx-setup build build-all push run start shell exec stop rm history clean restart
+
+buildx-setup:
+	@if ! docker buildx inspect $(BUILDER) > /dev/null 2>&1; then \
+		echo "Creating new buildx builder: $(BUILDER)"; \
+		docker buildx create --name $(BUILDER) --use; \
+	fi
+
+build: buildx-setup
+	docker buildx build \
+		--pull \
+		--load \
+		--tag $(CONTAINER) .
+	@echo Image built with tag: $(CONTAINER)
+
+build-all: buildx-setup
+	docker buildx build \
+		--pull \
+		--platform $(PLATFORMS) \
+		--tag $(IMAGE_NAME):$(VERSION) \
+		--tag $(IMAGE_NAME):latest .
+	@echo Multi-arch image built for: $(PLATFORMS)
+
+push: buildx-setup
+	docker buildx build \
+		--pull \
+		--platform $(PLATFORMS) \
+		--tag $(IMAGE_NAME):$(VERSION) \
+		--tag $(IMAGE_NAME):latest \
+		--push .
+	@echo Multi-arch image pushed: $(IMAGE_NAME):$(VERSION)
 
 start: run
 
@@ -64,11 +92,5 @@ history:
 clean:
 	-docker rm $(CONTAINER)
 	-docker rmi $(CONTAINER)
-
-push:
-	docker tag $(CONTAINER) $(IMAGE_NAME):$(VERSION)
-	docker tag $(CONTAINER) $(IMAGE_NAME):latest
-	docker push $(IMAGE_NAME):$(VERSION)
-	docker push $(IMAGE_NAME):latest
 
 restart: stop clean run
